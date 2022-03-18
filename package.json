@@ -1,0 +1,15 @@
+{
+  "name": "mini-vue",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://gitee.com/jiashengBen/mini-vue.git",
+  "author": "liangjs <asd153200>",
+  "license": "MIT",
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.4.1",
+    "jest": "^27.5.1"
+  }
+}
