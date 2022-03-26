@@ -1,0 +1,12 @@
+import { readonly } from '../reactive'
+
+describe('readonly', () => {
+    it('bar', () => {
+        const original = { name: 'ben' }
+        const observed = readonly(original)
+        expect(observed).not.toBe(original)
+        expect(observed.name).toBe('ben')
+        // observed.name = 'jack'
+        expect(observed.name).toBe('ben')
+    })
+})
