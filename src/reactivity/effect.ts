@@ -1,13 +1,34 @@
 class ReactiveEffect {
     fn: Function;
-    constructor(fn: Function) {
+    deps = []
+    state = true
+    onStop?: () => void
+    constructor(fn: Function, public scheduler?: Function) {
         this.fn = fn
+        this.scheduler = scheduler
     }
     run() {
         activeEffect = this
         return this.fn()
     }
+    stop() {
+        if (this.state) {
+            if (this.onStop) {
+                this.onStop()
+            }
+            cleanDeps(this)
+            this.state = false
+        }
+
+    }
 }
+
+const cleanDeps = (effect) => {
+    effect.deps.forEach((dep: any) => {
+        dep.delete(effect)
+    })
+};
+
 
 // 收集依赖
 // target -> key -> dep
@@ -19,9 +40,9 @@ export const track = (target, key) => {
         depMap = new Map()
         targetKeyMap.set(target, depMap)
     }
-    
+
     depMap = targetKeyMap.get(target)
-    
+
     if (!depMap.has(key)) {
         dep = new Set()
         depMap.set(key, dep)
@@ -29,8 +50,9 @@ export const track = (target, key) => {
 
     dep = depMap.get(key)
 
+    if (!activeEffect) return
     dep.add(activeEffect)
-    
+    activeEffect.deps.push(dep)
 };
 
 // 触发依赖
@@ -38,13 +60,25 @@ export const trigger = (target, key) => {
     let depsMap = targetKeyMap.get(target)
     let dep = depsMap.get(key)
     for (const effect of dep) {
-        effect.run()
+        if (effect.scheduler) {
+            effect.scheduler()
+        } else {
+            effect.run()
+        }
     }
 };
 
 let activeEffect;
-export const effect = (fn: Function) => {
-    const reactiveEffect = new ReactiveEffect(fn);
+export const effect = (fn: Function, options: any = {}) => {
+    const reactiveEffect = new ReactiveEffect(fn, options.scheduler);
+    reactiveEffect.onStop = options.onStop
     reactiveEffect.run();
-    return reactiveEffect.run.bind(reactiveEffect);
+    const runner: any = reactiveEffect.run.bind(reactiveEffect);
+    runner.effect = reactiveEffect
+    return runner
 };
+
+export const stop = (runner) => {
+    runner.effect.stop()
+};
+
