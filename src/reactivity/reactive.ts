@@ -1,39 +1,14 @@
 
-import { track, trigger } from './effect';
+import { baseHandler, readonlyHandler } from './baseHandlers';
 
-const createGetter = (isReadOnly = false) => {
-    return (target, key) => {
-        const res = Reflect.get(target, key)
-        // 收集依赖
-        if (!isReadOnly) {
-            track(target, key)
-        }
-        return res
-    }
-}
-
-const createSetter = () => {
-    return (target, key, value) => {
-        const res = Reflect.set(target, key, value)
-        // 触发依赖
-        trigger(target, key)
-        return res
-    }
-}
-
-export function reactive(params) {
-    return new Proxy(params, {
-        get: createGetter(),
-        set: createSetter()
-    })
-
+export function reactive(params: any) {
+    return createReactive(params, baseHandler)
 };
 
-export const readonly = (params) => {
-    return new Proxy(params, {
-        get: createGetter(true),
-        set(target, key, value) {
-            throw new Error(`${target} 因为 readonly模式，所以无法修改`)
-        }
-    })
+export const readonly = (params: any) => {
+    return createReactive(params, readonlyHandler)
+};
+
+const createReactive = (target, baseHandler) => {
+    return new Proxy(target, baseHandler)
 }
