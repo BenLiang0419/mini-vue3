@@ -70,11 +70,24 @@ describe("effect", () => {
         car.name = 'BMW'
         expect(name).toBe('BMW')
         stop(runner)
+
+        // 这里直接触发 set
+        // 只是触发了trigger，需要触发依赖
+        // 之前已经执行了stop，所以已经没有了任何的依赖
+        // name 还是等于BMW
         car.name = 'Audi'
         expect(name).toBe('BMW')
 
+        // 这里触发了 get set
+        // 执行了一个get，就要进行了一次收集依赖
+        // 之前调用stop的清除依赖已经失效了，被收集起来
+        // 所以在执行 set 的时候，就会触发依赖 执行effect runner
+        // 这里需要对stop进行优化
+        car.name = car.name + '2'
+        expect(name).toBe('BMW')
+
         runner()
-        expect(name).toBe('Audi')
+        expect(name).toBe('Audi2')
 
     })
 
