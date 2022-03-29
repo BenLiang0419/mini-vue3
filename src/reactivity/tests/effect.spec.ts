@@ -19,7 +19,7 @@ describe("effect", () => {
 
     });
 
-    it('effect runner', function() {
+    it('effect runner', function () {
         // effect(fn) => function(runner) => fn => return
         let foo = 10;
         const runner = effect(() => {
@@ -43,7 +43,7 @@ describe("effect", () => {
             run = runner
         })
 
-        const runner =effect(() => {
+        const runner = effect(() => {
             bar = foo.age
         }, { scheduler })
 
@@ -59,7 +59,7 @@ describe("effect", () => {
     })
 
     it('effect stop', () => {
-        
+
         const car = reactive({ name: 'benz' })
         let name;
 
@@ -79,7 +79,7 @@ describe("effect", () => {
     })
 
     it('effect onStop', () => {
-        
+
         const obj = reactive({
             bar: 1
         })
