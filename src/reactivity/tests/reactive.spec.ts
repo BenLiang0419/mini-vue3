@@ -24,4 +24,17 @@ describe('reactive', () => {
         expect(isReadonly(original)).toBe(false)
     })
 
+    it('nested reactive', () => {
+        const obj = {
+            key: 'value',
+            name: {
+                foo: 1
+            },
+            arr: [{ bar: 2 }]
+        }
+        const observed = reactive(obj)
+        expect(isReactive(observed)).toBe(true)
+        expect(isReactive(observed.name)).toBe(true)
+    })
+
 })
