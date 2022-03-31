@@ -1,4 +1,4 @@
-import { reactive, isReactive, readonly, isReadonly } from '../reactive'
+import { reactive, isReactive, readonly, isReadonly, isProxy } from '../reactive'
 
 describe('reactive', () => {
     it('bar', () => {
@@ -35,6 +35,20 @@ describe('reactive', () => {
         const observed = reactive(obj)
         expect(isReactive(observed)).toBe(true)
         expect(isReactive(observed.name)).toBe(true)
+    })
+
+    it('isProxy', () => {
+        const original = { name: 'ben' }
+        const observed = reactive(original)
+        const isReadObserved = readonly(original)
+
+        const proxy = new Proxy(original, {})
+
+        expect(isProxy(observed)).toBe(true)
+        expect(isProxy(isReadObserved)).toBe(true)
+
+        // because use isReactive or isReadonly
+        expect(isProxy(proxy)).toBe(false)
     })
 
 })
