@@ -7,3 +7,5 @@
 export const isObject = (target) => {
     return target !== null && typeof target === 'object'
 };
+
+export const extend = Object.assign
