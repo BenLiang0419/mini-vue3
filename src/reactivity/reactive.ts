@@ -1,5 +1,5 @@
 
-import { baseHandler, flags, readonlyHandler, shallowReadonlyHandler } from './baseHandlers';
+import { baseHandler, flags, readonlyHandler, shallowReadonlyHandler, shallowReactiveHandler } from './baseHandlers';
 
 type Proxy = ProxyConstructor
 
@@ -9,6 +9,11 @@ export const isReactive = (target) => {
 
 export const isReadonly = (target) => {
     return !!target[flags.IS_READONLY]
+};
+
+export const isProxy = (params: any) => {
+    // 判断是reactive 或者 判断是isReadOnly
+    return isReactive(params) || isReadonly(params)
 };
 
 export function reactive(params: any) {
@@ -23,9 +28,8 @@ export const shallowReadonly = (params: any) => {
     return createReactive(params, shallowReadonlyHandler)
 };
 
-export const isProxy = (params: any) => {
-    // 判断是reactive 或者 判断是isReadOnly
-    return isReactive(params) || isReadonly(params)
+export const shallowReactive = (params: any) => {
+    return createReactive(params, shallowReactiveHandler)
 }
 
 const createReactive = (target, baseHandler) => {

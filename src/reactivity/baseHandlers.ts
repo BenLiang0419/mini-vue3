@@ -7,8 +7,15 @@ export const enum flags {
     IS_READONLY = '__v_isReadonly'
 }
 
-const createGetter = (isReadOnly = false, isShallowReadonly = false) => {
+const createGetter = (isReadOnly = false, isShallowReadonly = false, isShallowReactive = false) => {
     return (target, key) => {
+
+        if (key === flags.IS_REACTIVE) {
+            return !isReadOnly
+        } else if (key === flags.IS_READONLY) {
+            return isReadOnly
+        }
+
         const res = Reflect.get(target, key)
 
          // shallowReadonly
@@ -17,14 +24,8 @@ const createGetter = (isReadOnly = false, isShallowReadonly = false) => {
              return res
          }
 
-        if (isObject(res)) {
+        if (isObject(res) && !isShallowReactive) {
             return isReadOnly ? readonly(res) : reactive(res)
-        }
-
-        if (key === flags.IS_REACTIVE) {
-            return !isReadOnly
-        } else if (key === flags.IS_READONLY) {
-            return isReadOnly
         }
 
         // 收集依赖
@@ -48,6 +49,7 @@ const get = createGetter()
 const set = createSetter()
 const readonlyGet = createGetter(true)
 const shallowReadonlyGet = createGetter(true, true)
+const shallowReactiveGet = createGetter(false, false, true)
 
 export const baseHandler = {
     get,
@@ -63,5 +65,10 @@ export const readonlyHandler = {
 
 export const shallowReadonlyHandler = extend({}, readonlyHandler, {
     get: shallowReadonlyGet
-})
+});
+
+export const shallowReactiveHandler = extend({}, baseHandler, {
+    get: shallowReactiveGet
+});
+
 
