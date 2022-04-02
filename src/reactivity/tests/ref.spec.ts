@@ -1,5 +1,6 @@
 import { effect } from "../effect"
-import { ref } from "../ref"
+import { isReactive, reactive } from "../reactive"
+import { isRef, ref, unRef } from "../ref"
 
 describe('refs', () => {
 
@@ -73,5 +74,29 @@ describe('refs', () => {
         expect(person.name).toBe('ben')
         expect(person.value).toBe('ben')
     })
+
+    it('isRef present', () => {
+        const refNum = ref(1)
+        const num = 1
+        const observed = reactive({
+            foo: 1
+        })
+        const refObj = ref({
+            bar: 1
+        })
+        expect(isRef(refNum)).toBe(true);
+        expect(isRef(num)).toBe(false);
+        expect(isRef(observed)).toBe(false);
+        expect(isRef(refObj)).toBe(true);
+        expect(isRef(refObj.value)).toBe(false)
+        expect(isReactive(refObj.value)).toBe(true)
+    });
+
+    it('unRef present', () => {
+        const refNum = ref(1)
+        expect(refNum.value).toBe(1);
+        expect(unRef(1)).toBe(1);
+        expect(unRef(refNum)).toBe(1);
+    });
 
 })

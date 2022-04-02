@@ -5,7 +5,8 @@ import { reactive } from "./reactive";
 class RefImpl {
     _value: any;
     public _rawValue;
-    public dep
+    public dep;
+    private __v_isRef: boolean = true;
     constructor(_value: any) {
         this._value = convert(_value)
         this._rawValue = _value
@@ -26,10 +27,6 @@ class RefImpl {
     }
 }
 
-export const ref = (val: any) => {
-    return new RefImpl(val)
-};
-
 function trackRefEffect(dep) {
     if (isTracking()) {
         trackEffect(dep)
@@ -39,3 +36,21 @@ function trackRefEffect(dep) {
 function convert(newValue) {
     return isObject(newValue) ? reactive(newValue) : newValue
 }
+
+export const ref = (val: any) => {
+    return new RefImpl(val)
+};
+
+export const isRef = (ref) => {
+    // 在RefImpl 里面给一个判断值
+    return !!ref.__v_isRef
+};
+
+export const unRef = (ref) => {
+    // 判断是不是ref
+    //   -- 如果是ref，则直接ref.value
+    //   -- 如果不是ref，则直接返回ref
+    return isRef(ref) ? ref.value : ref
+};
+
+
