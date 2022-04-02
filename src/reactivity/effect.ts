@@ -54,6 +54,7 @@ const cleanDeps = (effect) => {
 
 /**
  * 收集依赖
+ * target -> key -> dep
  * @param target 
  * @param key 
  * @returns 
@@ -76,6 +77,11 @@ export const track = (target, key) => {
         depMap.set(key, dep)
     }
     dep = depMap.get(key)
+    trackEffect(dep)
+};
+
+export const trackEffect = (dep) => {
+    if(dep.has(activeEffect)) return;
     dep.add(activeEffect)
     activeEffect.deps.push(dep)
 };
@@ -88,6 +94,10 @@ export const track = (target, key) => {
 export const trigger = (target, key) => {
     let depsMap = targetKeyMap.get(target)
     let dep = depsMap.get(key)
+    triggerEffect(dep)
+};
+
+export const triggerEffect = (dep) => {
     for (const effect of dep) {
         if (effect.scheduler) {
             effect.scheduler()
@@ -96,6 +106,7 @@ export const trigger = (target, key) => {
         }
     }
 };
+
 
 export const effect = (fn: Function, options: any = {}) => {
     const reactiveEffect = new ReactiveEffect(fn, options.scheduler);

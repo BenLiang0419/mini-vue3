@@ -9,3 +9,8 @@ export const isObject = (target) => {
 };
 
 export const extend = Object.assign
+
+export const hasChanged = (oldValue, newValue) => {
+    return !Object.is(oldValue, newValue)
+}
+
