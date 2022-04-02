@@ -1,6 +1,6 @@
 import { effect } from "../effect"
 import { isReactive, reactive } from "../reactive"
-import { isRef, ref, unRef } from "../ref"
+import { isRef, proxyRef, ref, unRef } from "../ref"
 
 describe('refs', () => {
 
@@ -97,6 +97,44 @@ describe('refs', () => {
         expect(refNum.value).toBe(1);
         expect(unRef(1)).toBe(1);
         expect(unRef(refNum)).toBe(1);
+    });
+
+    it('proxyRef present', () => {
+        // vue3-data step() { return { ref } }
+        // vue3-template 不用.value
+        // 是因为使用了proxyRef
+        const user = {
+            age: ref(10),
+            name: 'Ben'
+        }
+
+        const proxyRefUser = proxyRef(user)
+
+        expect(user.age.value).toBe(10);
+        expect(proxyRefUser.age).toBe(10);
+        expect(proxyRefUser.name).toBe('Ben');
+
+        proxyRefUser.age = 1
+        expect(proxyRefUser.age).toBe(1);
+        expect(user.age.value).toBe(1);
+
+        proxyRefUser.age = ref(2)
+        expect(proxyRefUser.age).toBe(2);
+        expect(user.age.value).toBe(2)
+
+        user.name = '1'
+        expect(proxyRefUser.name).toBe('1');
+
+        // const customer = {
+        //     age: 1
+        // }
+        // const proxyCustomer = proxyRef(customer)
+        // proxyCustomer.name = 1
+        // expect(proxyCustomer.name).toBe(1);
+        // expect(user.name).toBe(1);
+
+
+
     });
 
 })
