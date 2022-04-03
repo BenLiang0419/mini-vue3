@@ -4,7 +4,7 @@ let activeEffect;
 // 是否应该收集
 let shouldTrack = false;
 
-class ReactiveEffect {
+export class ReactiveEffect {
     fn: Function;
     deps = []
     state = true
