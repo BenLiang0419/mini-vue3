@@ -46,9 +46,7 @@ function handleSetupResult(instance, setupResult) {
 
 function finishComponentSetup(instance: any) {
     const component = instance.type
-    // 如果没有render，则把component传给render
-    if (!component.render) {
-        component.render = component.render
-    }
+    // 暂时默认都有render
+    instance.render = component.render
 }
 

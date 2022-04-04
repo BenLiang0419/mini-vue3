@@ -10,11 +10,11 @@ export const render = (vnode, container) => {
 export const patch = (vnode, container) => {
     
     // 判断 是不是 element类型
+    // 如果是element类型的
+    // processElement()
 
     // 处理组件
     processComponent(vnode, container)
-
-    
 
 };
 
@@ -39,7 +39,7 @@ export const mountComponent = (vnode, container) => {
 };
 
 export const setupRenderEffect = (instance, container) => {
-    const subTree = instance.render
+    const subTree = instance.render()
 
     // subTree 虚拟节点树 vnode tree
     // vnode -> patch
