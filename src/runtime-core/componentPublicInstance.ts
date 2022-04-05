@@ -1,3 +1,6 @@
+const publicPropertiesMap = {
+    $el: (instance) => instance.vnode.el
+}
 
 export const publicInstanceProxyHandlers = {
     get({ _: instance }, key) {
@@ -6,8 +9,9 @@ export const publicInstanceProxyHandlers = {
             return setupState[key]
         }
 
-        if (key === '$el') {
-            return instance.vnode.el
+        const publicProperty = publicPropertiesMap[key]
+        if(publicProperty) {
+            return publicProperty(instance)
         }
 
     }

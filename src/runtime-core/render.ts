@@ -85,7 +85,6 @@ export const setupRenderEffect = (instance, vnode, container) => {
     patch(subTree, container)
 
     // 完成了所有的patch后
-    // TODO 这里理解得不是很透
     vnode.el = subTree.el
 
 };
