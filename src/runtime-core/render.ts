@@ -28,7 +28,8 @@ function processElement(vnode, container) {
     const { type, props, children } = vnode
 
     // 创建对应的el
-    const el = document.createElement(type)
+    // vnode -> element -> div
+    const el = (vnode.el =  document.createElement(type))
 
     // 处理props
     for(const key in props) {
@@ -69,17 +70,24 @@ export const mountComponent = (vnode, container) => {
     setupComponent(instance)
 
     // 进行拆箱
-    setupRenderEffect(instance, container)
+    setupRenderEffect(instance, vnode, container)
 
 };
 
-export const setupRenderEffect = (instance, container) => {
-    const subTree = instance.render()
+export const setupRenderEffect = (instance, vnode, container) => {
+    const { proxy } = instance
+    // 指定代理对象 this.xxx
+    const subTree = instance.render.call(proxy)
 
     // subTree 虚拟节点树 vnode tree
     // vnode -> patch
     // vnode -> element -> mountElement
     patch(subTree, container)
+
+    // 完成了所有的patch后
+    // TODO 这里理解得不是很透
+    vnode.el = subTree.el
+
 };
 
 
