@@ -1,4 +1,4 @@
-import { isObject } from "../shared";
+import { ShapeFlags } from "../shared/shapeFlags";
 import { createComponentInstance, setupComponent } from "./component";
 
 export const render = (vnode, container) => {
@@ -13,19 +13,19 @@ export const patch = (vnode, container) => {
     // 判断 是不是 element类型
     // 如果是Component，type => Object
     // 如果是element类型，type => div等标签
-    const { type } = vnode
+    const { shapeFlags } = vnode
     
-    if (typeof type === 'string') {
+    if (shapeFlags & ShapeFlags.ELEMENT) {
         // 处理Element
         processElement(vnode, container)
-    } else if (isObject(type)) {
+    } else if (shapeFlags & ShapeFlags.STATEFUL_COMPONENT) {
         // 处理组件
         processComponent(vnode, container)
     }
 };
 
 function processElement(vnode, container) {
-    const { type, props, children } = vnode
+    const { type, props, children, shapeFlags } = vnode
 
     // 创建对应的el
     // vnode -> element -> div
@@ -38,9 +38,9 @@ function processElement(vnode, container) {
     }
 
     // 处理children --> string, Array
-    if (typeof children === 'string') {
+    if (shapeFlags & ShapeFlags.TEXT_CHILDREN) {
         el.innerText = children
-    } else if(Array.isArray(children)) {
+    } else if(shapeFlags & ShapeFlags.ARRAY_CHILDREN) {
         mountElementChildren(children, el)
     }
 

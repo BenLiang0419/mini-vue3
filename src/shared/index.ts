@@ -14,3 +14,6 @@ export const hasChanged = (oldValue, newValue) => {
     return !Object.is(oldValue, newValue)
 }
 
+export const isString = (val) => typeof val === 'string'
+
+
