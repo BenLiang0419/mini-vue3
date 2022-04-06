@@ -31,10 +31,15 @@ function processElement(vnode, container) {
     // vnode -> element -> div
     const el = (vnode.el =  document.createElement(type))
 
-    // 处理props
+    // 处理props => 普通属性 和 注册事件
     for(const key in props) {
-        const val = props[key]
-        el.setAttribute(key, val)
+        const isOn = (key: string) => /^on[A-Z]/.test(key)
+        if (isOn(key)) {
+            const event = key.slice(2).toLowerCase()
+            el.addEventListener(event, props[key])
+        } else {
+            el.setAttribute(key, props[key])
+        }
     }
 
     // 处理children --> string, Array

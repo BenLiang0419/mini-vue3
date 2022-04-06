@@ -14,7 +14,13 @@ export const App = {
             'div',
             {
                 id: 'root',
-                class: 'big'
+                class: 'big',
+                onClick: () => {
+                    console.log('onclick')
+                },
+                onMouseleave: () => {
+                    console.log('mouse leave')
+                }
             },
             // [
             //     h('h1', { class: "red" }, "Hi"), 
