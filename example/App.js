@@ -17,17 +17,24 @@ export const App = {
             {
                 id: 'root',
                 class: 'big',
-                onClick: () => {
-                    console.log('onclick')
-                },
-                onMouseleave: () => {
-                    console.log('mouse leave')
-                }
+                // onClick: () => {
+                //     console.log('onclick')
+                // },
+                // onMouseleave: () => {
+                //     console.log('mouse leave')
+                // }
             },
             [
-                h('h1', { class: "red" }, "Hi"), 
+                h('h1', { class: "red" }, "Hi"),
                 h('h2', { class: "blue" }, "mini-vue"),
-                h(Foo, { count: 1 })
+                h(Foo, {
+                    count: 1, onAdd() {
+                        console.log('onAdd')
+                    },
+                    onAddCount(value) {
+                        console.log('onAddCount', value)
+                    }
+                })
             ]
         )
     }
