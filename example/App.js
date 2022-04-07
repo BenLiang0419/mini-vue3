@@ -1,8 +1,10 @@
 
 import { h } from '../lib/mini-vue.esm.js'
+import { Foo } from './Foo.js';
 
 window.self = null
 export const App = {
+    name: 'App',
     setup() {
         return {
             username: 'BoLi-luyi'
@@ -22,11 +24,11 @@ export const App = {
                     console.log('mouse leave')
                 }
             },
-            // [
-            //     h('h1', { class: "red" }, "Hi"), 
-            //     h('h2', { class: "blue" }, "mini-vue")
-            // ]
-            `Hi, ` + this.username
+            [
+                h('h1', { class: "red" }, "Hi"), 
+                h('h2', { class: "blue" }, "mini-vue"),
+                h(Foo, { count: 1 })
+            ]
         )
     }
 };

@@ -16,4 +16,5 @@ export const hasChanged = (oldValue, newValue) => {
 
 export const isString = (val) => typeof val === 'string'
 
+export const isOwn = (val: any, key: string) => Object.prototype.hasOwnProperty.call(val, key)
 

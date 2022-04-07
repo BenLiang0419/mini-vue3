@@ -1,4 +1,5 @@
 
+import { isObject } from '../shared';
 import { baseHandler, flags, readonlyHandler, shallowReadonlyHandler, shallowReactiveHandler } from './baseHandlers';
 
 type Proxy = ProxyConstructor
@@ -33,5 +34,9 @@ export const shallowReactive = (params: any) => {
 }
 
 const createReactive = (target, baseHandler) => {
+    if (!isObject(target)) {
+        console.warn(`Reactive target ${target} 只能是对象。`)
+        return target
+    }
     return new Proxy(target, baseHandler)
 }
