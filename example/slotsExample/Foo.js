@@ -10,7 +10,7 @@ export const Foo = {
         console.log('this.$slots', this.$slots)
 
         const msg = 'msg'
-        const foo = h('div', {}, "foo")
+        const foo = h('h1', {}, "foo")
         // 2. this.$slots -> array, 实际上渲染时候需要的是vnode
         //   所以就有了renderSlot
         // 3. 具名插槽

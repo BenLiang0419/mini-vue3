@@ -12,13 +12,13 @@ export const App = {
     },
     render() {
         window.self = this
-        const app = h("div", {}, "app")
+        const app = h("h1", {}, "app")
         const foo = h(Foo,
             {},
             // [h("div", {}, "app1")]
             {
-                header: ({ msg }) => h("div", {}, "abc header " + msg),
-                footer: () => h("div", {}, "asd footer")
+                header: ({ msg }) => h("h1", {}, "abc header " + msg),
+                footer: () => h("h1", {}, "asd footer")
             }
         )
 

@@ -1,5 +1,6 @@
 import { ShapeFlags } from "../shared/shapeFlags";
 import { createComponentInstance, setupComponent } from "./component";
+import { Fragment } from "./vnode";
 
 export const render = (vnode, container) => {
 
@@ -13,14 +14,22 @@ export const patch = (vnode, container) => {
     // 判断 是不是 element类型
     // 如果是Component，type => Object
     // 如果是element类型，type => div等标签
-    const { shapeFlags } = vnode
-    
-    if (shapeFlags & ShapeFlags.ELEMENT) {
-        // 处理Element
-        processElement(vnode, container)
-    } else if (shapeFlags & ShapeFlags.STATEFUL_COMPONENT) {
-        // 处理组件
-        processComponent(vnode, container)
+    const { shapeFlags, type } = vnode
+
+    switch (type) {
+        case Fragment: {
+            processFragment(vnode, container)
+            break;
+        }
+        default: {
+            if (shapeFlags & ShapeFlags.ELEMENT) {
+                // 处理Element
+                processElement(vnode, container)
+            } else if (shapeFlags & ShapeFlags.STATEFUL_COMPONENT) {
+                // 处理组件
+                processComponent(vnode, container)
+            }
+        }
     }
 };
 
@@ -29,10 +38,10 @@ function processElement(vnode, container) {
 
     // 创建对应的el
     // vnode -> element -> div
-    const el = (vnode.el =  document.createElement(type))
+    const el = (vnode.el = document.createElement(type))
 
     // 处理props => 普通属性 和 注册事件
-    for(const key in props) {
+    for (const key in props) {
         const isOn = (key: string) => /^on[A-Z]/.test(key)
         if (isOn(key)) {
             const event = key.slice(2).toLowerCase()
@@ -45,26 +54,31 @@ function processElement(vnode, container) {
     // 处理children --> string, Array
     if (shapeFlags & ShapeFlags.TEXT_CHILDREN) {
         el.innerText = children
-    } else if(shapeFlags & ShapeFlags.ARRAY_CHILDREN) {
-        mountElementChildren(children, el)
+    } else if (shapeFlags & ShapeFlags.ARRAY_CHILDREN) {
+        mountChildren(children, el)
     }
 
     container.append(el)
 
 }
 
-function mountElementChildren(vnodes, container) {
-    vnodes.forEach(element => {
-        patch(element, container)
-    });
-}
-
 export const processComponent = (vnode, container) => {
-    
+
     // 挂载组件
     mountComponent(vnode, container)
 
 };
+
+export const processFragment = (vnode, container) => {
+    mountChildren(vnode.children, container)
+};
+
+
+function mountChildren(vnodes, container) {
+    vnodes.forEach(element => {
+        patch(element, container)
+    });
+}
 
 export const mountComponent = (vnode, container) => {
 
