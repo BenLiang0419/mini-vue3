@@ -1,11 +1,12 @@
 
-import { h, createTextVNode } from '../../lib/mini-vue.esm.js'
+import { h, createTextVNode, getCurrentInstance } from '../../lib/mini-vue.esm.js'
 import { Foo } from './Foo.js';
 
 window.self = null
 export const App = {
     name: 'App',
     setup() {
+        console.log("current instance", getCurrentInstance())
         return {
             username: 'BoLi-luyi'
         }

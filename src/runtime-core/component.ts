@@ -4,6 +4,7 @@ import { initProps } from "./componentProps";
 import { publicInstanceProxyHandlers } from "./componentPublicInstance";
 import { initSlots } from "./componentSlots";
 
+let instance = null
 export const createComponentInstance = (vnode) => {
 
     const componentInstance = {
@@ -12,7 +13,7 @@ export const createComponentInstance = (vnode) => {
         setupState: {},
         props: {},
         slots: {},
-        emit: () => {}
+        emit: () => { }
     }
 
     // 初始化emit
@@ -42,11 +43,14 @@ export function setupStatefulComponent(instance: any) {
     const { setup } = component
 
     if (setup) {
+        setCurrentInstance(instance)
         const setupResult = setup(shallowReadonly(instance.props), {
             emit: instance.emit
         })
+        setCurrentInstance(null)
         handleSetupResult(instance, setupResult)
     }
+
 
 }
 
@@ -68,3 +72,10 @@ function finishComponentSetup(instance: any) {
     instance.render = component.render
 }
 
+export const getCurrentInstance = () => {
+    return instance
+};
+
+function setCurrentInstance(_instance) {
+    instance = _instance
+};
