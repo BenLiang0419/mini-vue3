@@ -1,6 +1,6 @@
 import { ShapeFlags } from "../shared/shapeFlags";
 import { createComponentInstance, setupComponent } from "./component";
-import { Fragment } from "./vnode";
+import { Fragment, Text } from "./vnode";
 
 export const render = (vnode, container) => {
 
@@ -21,6 +21,10 @@ export const patch = (vnode, container) => {
             processFragment(vnode, container)
             break;
         }
+        case Text: {
+            processText(vnode, container)
+            break;
+        }
         default: {
             if (shapeFlags & ShapeFlags.ELEMENT) {
                 // 处理Element
@@ -32,6 +36,23 @@ export const patch = (vnode, container) => {
         }
     }
 };
+
+export const processComponent = (vnode, container) => {
+
+    // 挂载组件
+    mountComponent(vnode, container)
+
+};
+
+export const processFragment = (vnode, container) => {
+    mountChildren(vnode.children, container)
+};
+
+export const processText = (vnode, container) => {
+    const { children } = vnode
+    const textNode = (vnode.el = document.createTextNode(children))
+    container.append(textNode)
+}
 
 function processElement(vnode, container) {
     const { type, props, children, shapeFlags } = vnode
@@ -61,18 +82,6 @@ function processElement(vnode, container) {
     container.append(el)
 
 }
-
-export const processComponent = (vnode, container) => {
-
-    // 挂载组件
-    mountComponent(vnode, container)
-
-};
-
-export const processFragment = (vnode, container) => {
-    mountChildren(vnode.children, container)
-};
-
 
 function mountChildren(vnodes, container) {
     vnodes.forEach(element => {
