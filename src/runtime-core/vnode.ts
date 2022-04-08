@@ -1,4 +1,4 @@
-import { isString } from "../shared";
+import { isObject, isString } from "../shared";
 import { ShapeFlags } from "../shared/shapeFlags";
 
 export const createVNode = (type, props?, children?) => {
@@ -16,6 +16,14 @@ export const createVNode = (type, props?, children?) => {
         vnode.shapeFlags |= ShapeFlags.TEXT_CHILDREN
     } else {
         vnode.shapeFlags |= ShapeFlags.ARRAY_CHILDREN
+    }
+
+    // 初始化slot
+    // 组件 + children => object
+    if (vnode.shapeFlags & ShapeFlags.STATEFUL_COMPONENT) {
+        if (isObject(children)) {
+            vnode.shapeFlags |= ShapeFlags.SLOT_CHILDREN
+        }
     }
 
     return vnode

@@ -34,6 +34,9 @@ export const App = {
                     onAddCount(value) {
                         console.log('onAddCount', value)
                     }
+                }, {
+                    "header": h('h1', {}, "123 header"),
+                    "footer": h('h1', { class: 'blue' }, "abc footer")
                 })
             ]
         )
