@@ -5,7 +5,7 @@ import { publicInstanceProxyHandlers } from "./componentPublicInstance";
 import { initSlots } from "./componentSlots";
 
 let instance = null
-export const createComponentInstance = (vnode) => {
+export const createComponentInstance = (vnode, parent) => {
 
     const componentInstance = {
         vnode,
@@ -13,6 +13,8 @@ export const createComponentInstance = (vnode) => {
         setupState: {},
         props: {},
         slots: {},
+        provides: {},
+        parent,
         emit: () => { }
     }
 

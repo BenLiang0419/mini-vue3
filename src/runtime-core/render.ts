@@ -9,7 +9,7 @@ export const render = (vnode, container) => {
 
 };
 
-export const patch = (vnode, container) => {
+export const patch = (vnode, container, parent = null) => {
 
     // 判断 是不是 element类型
     // 如果是Component，type => Object
@@ -18,7 +18,7 @@ export const patch = (vnode, container) => {
 
     switch (type) {
         case Fragment: {
-            processFragment(vnode, container)
+            processFragment(vnode, container, parent)
             break;
         }
         case Text: {
@@ -28,24 +28,24 @@ export const patch = (vnode, container) => {
         default: {
             if (shapeFlags & ShapeFlags.ELEMENT) {
                 // 处理Element
-                processElement(vnode, container)
+                processElement(vnode, container, parent)
             } else if (shapeFlags & ShapeFlags.STATEFUL_COMPONENT) {
                 // 处理组件
-                processComponent(vnode, container)
+                processComponent(vnode, container, parent)
             }
         }
     }
 };
 
-export const processComponent = (vnode, container) => {
+export const processComponent = (vnode, container, parent) => {
 
     // 挂载组件
-    mountComponent(vnode, container)
+    mountComponent(vnode, container, parent)
 
 };
 
-export const processFragment = (vnode, container) => {
-    mountChildren(vnode.children, container)
+export const processFragment = (vnode, container, parent) => {
+    mountChildren(vnode.children, container, parent)
 };
 
 export const processText = (vnode, container) => {
@@ -54,7 +54,7 @@ export const processText = (vnode, container) => {
     container.append(textNode)
 }
 
-function processElement(vnode, container) {
+function processElement(vnode, container, parent) {
     const { type, props, children, shapeFlags } = vnode
 
     // 创建对应的el
@@ -76,23 +76,23 @@ function processElement(vnode, container) {
     if (shapeFlags & ShapeFlags.TEXT_CHILDREN) {
         el.innerText = children
     } else if (shapeFlags & ShapeFlags.ARRAY_CHILDREN) {
-        mountChildren(children, el)
+        mountChildren(children, el, parent)
     }
 
     container.append(el)
 
 }
 
-function mountChildren(vnodes, container) {
+function mountChildren(vnodes, container, parent) {
     vnodes.forEach(element => {
-        patch(element, container)
+        patch(element, container, parent)
     });
 }
 
-export const mountComponent = (vnode, container) => {
-
+export const mountComponent = (vnode, container, parent) => {
+    console.log('parent', parent)
     // 创建组件实例， 收集数据
-    const instance = createComponentInstance(vnode)
+    const instance = createComponentInstance(vnode, parent)
 
     // 初始化 props, slots, setup
     setupComponent(instance)
@@ -110,7 +110,7 @@ export const setupRenderEffect = (instance, vnode, container) => {
     // subTree 虚拟节点树 vnode tree
     // vnode -> patch
     // vnode -> element -> mountElement
-    patch(subTree, container)
+    patch(subTree, container, instance)
 
     // 完成了所有的patch后
     vnode.el = subTree.el
