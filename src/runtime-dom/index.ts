@@ -5,13 +5,13 @@ export const createElement = (type) => {
     return document.createElement(type)
 };
 
-export const patchProps = (el, key, props) => {
+export const patchProps = (el, key, value) => {
     const isOn = (key: string) => /^on[A-Z]/.test(key)
     if (isOn(key)) {
         const event = key.slice(2).toLowerCase()
-        el.addEventListener(event, props[key])
+        el.addEventListener(event, value)
     } else {
-        el.setAttribute(key, props[key])
+        el.setAttribute(key, value)
     }
 };
 

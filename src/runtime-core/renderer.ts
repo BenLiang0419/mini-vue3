@@ -66,7 +66,7 @@ export const createRenderer = (options: any) => {
     
         // 处理props => 普通属性 和 注册事件
         for (const key in props) {
-            patchProps(el, key, props)
+            patchProps(el, key, props[key])
         }
 
         // 处理children --> string, Array
@@ -80,7 +80,7 @@ export const createRenderer = (options: any) => {
     
     }
     
-    function mountChildren(vnodes, container, parent) {
+    function mountChildren(vnodes = [], container, parent) {
         vnodes.forEach(element => {
             patch(element, container, parent)
         });
