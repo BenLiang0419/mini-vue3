@@ -13,7 +13,7 @@ export const createComponentInstance = (vnode, parent) => {
         setupState: {},
         props: {},
         slots: {},
-        provides: {},
+        provides: parent ? parent.provides : {},
         parent,
         emit: () => { }
     }

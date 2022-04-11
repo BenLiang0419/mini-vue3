@@ -13,28 +13,32 @@ const Foo = {
     },
     render() {
         const compOne = h("h1", {}, this.msg);
-        const bar = h(Bar)
+        const compTwo = h(FooSecond)
 
+        return h("div", {}, [compOne, compTwo])
+    }
+};
+
+const FooSecond = {
+    setup() {
+        provide('foo', 'fooTwo')
+        const foo = inject('foo')
+        return {
+            msg: 'foo-2',
+            foo
+        }
+    },
+    render() {
+        const compOne = h("h1", {}, this.msg + '->' + this.foo);
+        const bar = h(Bar)
         return h("div", {}, [compOne, bar])
     }
 };
 
-// const FooSecond = {
-//     setup() {
-//         return {
-//             msg: 'foo-2'
-//         }
-//     },
-//     render() {
-//         const compOne = h("span", {}, this.msg);
-//         return h(compOne);
-//     }
-// };
-
 const Bar = {
     setup() {
-        const foo = inject('foo')
         const bar = inject('bar')
+        const foo = inject('foo')
 
         return {
             foo, bar
