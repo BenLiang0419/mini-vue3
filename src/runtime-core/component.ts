@@ -1,3 +1,4 @@
+import { proxyRef } from "../reactivity";
 import { shallowReadonly } from "../reactivity/reactive";
 import { emit } from "./componentEmits";
 import { initProps } from "./componentProps";
@@ -13,6 +14,8 @@ export const createComponentInstance = (vnode, parent) => {
         setupState: {},
         props: {},
         slots: {},
+        isMounted: false,
+        subTree: {},
         provides: parent ? parent.provides : {},
         parent,
         emit: () => { }
@@ -60,7 +63,8 @@ function handleSetupResult(instance, setupResult) {
     // setupResult 返回的值类型可能是 function | object
     // TODO Function先不处理， 先处理Object
     if (typeof setupResult === 'object') {
-        instance.setupState = setupResult
+        // 通过proxyRef来解决Ref获取值
+        instance.setupState = proxyRef(setupResult)
     }
 
     // 保证render有值
