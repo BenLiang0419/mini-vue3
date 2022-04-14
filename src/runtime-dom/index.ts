@@ -5,13 +5,19 @@ export const createElement = (type) => {
     return document.createElement(type)
 };
 
-export const patchProps = (el, key, value) => {
+export const patchProp = (el, key, preValue, nextValue) => {
     const isOn = (key: string) => /^on[A-Z]/.test(key)
     if (isOn(key)) {
         const event = key.slice(2).toLowerCase()
-        el.addEventListener(event, value)
+        el.addEventListener(event, nextValue)
     } else {
-        el.setAttribute(key, value)
+        if (nextValue === null || nextValue === undefined) {
+            // 如果是 null 或者 undefined，直接remove
+            el.removeAttribute(key)
+        } else {
+            // 正常设置
+            el.setAttribute(key, nextValue)
+        }
     }
 };
 
@@ -21,7 +27,7 @@ export const insert = (el, container) => {
 
 const renderer: any = createRenderer({
     createElement,
-    patchProps,
+    patchProp,
     insert
 })
 

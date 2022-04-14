@@ -6,7 +6,7 @@ import { Fragment, Text } from "./vnode";
 
 export const createRenderer = (options: any) => {
 
-    const { createElement, patchProps, insert } = options
+    const { createElement, patchProp: hostPatchProp, insert } = options
 
     const render = (n2, container) => {
         // 调用patch
@@ -42,10 +42,8 @@ export const createRenderer = (options: any) => {
     };
 
     const processComponent = (n1, n2, container, parent) => {
-
         // 挂载组件
         mountComponent(n2, container, parent)
-
     };
 
     const processFragment = (n1, n2, container, parent) => {
@@ -75,7 +73,7 @@ export const createRenderer = (options: any) => {
 
         // 处理props => 普通属性 和 注册事件
         for (const key in props) {
-            patchProps(el, key, props[key])
+            hostPatchProp(el, key, null, props[key])
         }
 
         // 处理children --> string, Array
@@ -91,6 +89,44 @@ export const createRenderer = (options: any) => {
     function patchElement(n1, n2, container) {
         console.log("n1", n1)
         console.log("n2", n2)
+
+        const oldProps = n1.props
+        const newProps = n2.props
+
+        // 需要把 el 挂载到新的 vnode
+        // n1: 旧的 => n2: 新的
+        const el = (n2.el = n1.el);
+
+        // 对比props
+        patchProps(el, oldProps, newProps)
+
+    }
+
+    function patchProps(el, oldProps, newProps) {
+        console.log('oldProps', oldProps)
+        console.log('newProps', newProps)
+
+        // 当不相同的时候才会去判断
+        if (oldProps !== newProps) {
+            // 遍历新值
+            for (const key in newProps) {
+                const prevProp = oldProps[key];
+                const nextProp = newProps[key];
+                if (prevProp !== newProps) {
+                    // 对比属性值，如果不相同则需要进行更新
+                    hostPatchProp(el, key, prevProp, nextProp)
+                }
+            }
+
+            // 遍历旧值
+            for (const key in oldProps) {
+                const prevProp = oldProps[key]
+                if (!(key in newProps)) {
+                    // 判断新props没有的，没有的就去掉null
+                    hostPatchProp(el, key, prevProp, null)
+                }
+            }
+        }
     }
 
     function mountChildren(vnodes = [], container, parent) {
@@ -151,8 +187,6 @@ export const createRenderer = (options: any) => {
 
                 // 新节点 和 旧节点 进行对比
                 patch(prevSubTree, subTree, container, instance)
-
-
 
             }
 
