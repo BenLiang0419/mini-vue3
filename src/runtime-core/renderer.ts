@@ -6,7 +6,12 @@ import { Fragment, Text } from "./vnode";
 
 export const createRenderer = (options: any) => {
 
-    const { createElement, patchProp: hostPatchProp, insert } = options
+    const {
+        createElement,
+        patchProp: hostPatchProp,
+        insert, remove: hostRemove,
+        setElementText: hostSetElementText
+    } = options
 
     const render = (n2, container) => {
         // 调用patch
@@ -18,7 +23,7 @@ export const createRenderer = (options: any) => {
         // 判断 是不是 element类型
         // 如果是Component，type => Object
         // 如果是element类型，type => div等标签
-        const { shapeFlags, type } = n2
+        const { shapeFlag, type } = n2
 
         switch (type) {
             case Fragment: {
@@ -30,10 +35,10 @@ export const createRenderer = (options: any) => {
                 break;
             }
             default: {
-                if (shapeFlags & ShapeFlags.ELEMENT) {
+                if (shapeFlag & ShapeFlags.ELEMENT) {
                     // 处理Element
                     processElement(n1, n2, container, parent)
-                } else if (shapeFlags & ShapeFlags.STATEFUL_COMPONENT) {
+                } else if (shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
                     // 处理组件
                     processComponent(n1, n2, container, parent)
                 }
@@ -60,12 +65,12 @@ export const createRenderer = (options: any) => {
         if (!n1) {
             mountElement(n2, container, parent)
         } else {
-            patchElement(n1, n2, container)
+            patchElement(n1, n2, container, parent)
         }
     }
 
     function mountElement(vnode, container, parent) {
-        const { type, props, children, shapeFlags } = vnode
+        const { type, props, children, shapeFlag } = vnode
 
         // 创建对应的el
         // vnode -> element -> div
@@ -77,16 +82,16 @@ export const createRenderer = (options: any) => {
         }
 
         // 处理children --> string, Array
-        if (shapeFlags & ShapeFlags.TEXT_CHILDREN) {
+        if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
             el.innerText = children
-        } else if (shapeFlags & ShapeFlags.ARRAY_CHILDREN) {
+        } else if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
             mountChildren(children, el, parent)
         }
 
         insert(el, container)
     }
 
-    function patchElement(n1, n2, container) {
+    function patchElement(n1, n2, container, parent) {
         console.log("n1", n1)
         console.log("n2", n2)
 
@@ -99,6 +104,9 @@ export const createRenderer = (options: any) => {
 
         // 对比props
         patchProps(el, oldProps, newProps)
+
+        // 对比children
+        patchChildren(n1, n2, el, parent)
 
     }
 
@@ -126,6 +134,39 @@ export const createRenderer = (options: any) => {
                     hostPatchProp(el, key, prevProp, null)
                 }
             }
+        }
+    }
+
+    function patchChildren(n1, n2, container, parent) {
+        // 获取shapeFlags 来判断类型
+        const prevShapeFlag = n1.shapeFlag
+        const shapeFlag = n2.shapeFlag
+
+        // 新节点是 Text 时候
+        if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
+            // 老节点是 Children 
+            if (prevShapeFlag & ShapeFlags.ARRAY_CHILDREN) {
+                // 清空老的 Array子节点
+                unmountChildren(n1.children)
+            }
+            // 新老节点都不相同， 新节点需要是Text
+            if (n1.children !== n2.children) {
+                // 插入新的 Text节点
+                hostSetElementText(container, n2.children)
+            }
+        } else {
+            // 新节点是 Children 时候
+            if (prevShapeFlag & ShapeFlags.TEXT_CHILDREN) {
+                // 老节点是 Text
+                hostSetElementText(container, "")
+            }
+            mountChildren(n2.children, container, parent)
+        }
+    }
+
+    function unmountChildren(children) {
+        for (const key in children) {
+            hostRemove(children[key].el)
         }
     }
 

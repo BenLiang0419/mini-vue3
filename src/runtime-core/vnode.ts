@@ -9,23 +9,23 @@ export const createVNode = (type, props?, children?) => {
     const vnode = {
         type,
         props,
-        shapeFlags: getShapeFlags(type),
+        shapeFlag: getShapeFlags(type),
         children,
         el: null
     }
 
     // 使用二进制来进行判断
     if (isString(children)) {
-        vnode.shapeFlags |= ShapeFlags.TEXT_CHILDREN
+        vnode.shapeFlag |= ShapeFlags.TEXT_CHILDREN
     } else {
-        vnode.shapeFlags |= ShapeFlags.ARRAY_CHILDREN
+        vnode.shapeFlag |= ShapeFlags.ARRAY_CHILDREN
     }
 
     // 初始化slot
     // 组件 + children => object
-    if (vnode.shapeFlags & ShapeFlags.STATEFUL_COMPONENT) {
+    if (vnode.shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
         if (isObject(children)) {
-            vnode.shapeFlags |= ShapeFlags.SLOT_CHILDREN
+            vnode.shapeFlag |= ShapeFlags.SLOT_CHILDREN
         }
     }
 

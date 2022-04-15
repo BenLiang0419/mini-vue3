@@ -7,7 +7,7 @@ export const initSlots = (instance, children) => {
     // instance.slots = Array.isArray(children) ? children : [children]
 
     const { vnode } = instance
-    if (vnode.shapeFlags & ShapeFlags.SLOT_CHILDREN) {
+    if (vnode.shapeFlag & ShapeFlags.SLOT_CHILDREN) {
         normalizeObject(children, instance);
     }
 };

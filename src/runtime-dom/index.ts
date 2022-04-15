@@ -21,6 +21,17 @@ export const patchProp = (el, key, preValue, nextValue) => {
     }
 };
 
+export const setElementText = (el, text) => {
+    el.textContent = text
+};
+
+export const remove = (child) => {
+    const parent = child.parentNode
+    if (parent) {
+        parent.removeChild(child)
+    }
+}
+
 export const insert = (el, container) => {
     container.append(el)
 };
@@ -28,7 +39,9 @@ export const insert = (el, container) => {
 const renderer: any = createRenderer({
     createElement,
     patchProp,
-    insert
+    insert,
+    remove,
+    setElementText
 })
 
 export function createApp (...args) {
