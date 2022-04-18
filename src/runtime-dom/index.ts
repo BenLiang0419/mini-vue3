@@ -32,8 +32,8 @@ export const remove = (child) => {
     }
 }
 
-export const insert = (el, container) => {
-    container.append(el)
+export const insert = (child, parent, anchor) => {
+    parent.insertBefore(child, anchor)
 };
 
 const renderer: any = createRenderer({

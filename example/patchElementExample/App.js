@@ -3,6 +3,7 @@ import { h } from '../../lib/mini-vue.esm.js'
 import { Array2Text } from './Array2Text.js'
 import { Text2Text } from './Text2Text.js'
 import { Text2Array } from './Text2Array.js'
+import { Array2Array } from './Array2Array.js';
 
 export const App = {
     name: 'App',
@@ -25,7 +26,9 @@ export const App = {
                 // 更新流程：Text更换成Text
                 // h(Text2Text)
                 // 更新流程：Text更换成Array
-                h(Text2Array)
+                // h(Text2Array)
+                // 更新流程：Array更换成Array
+                h(Array2Array)
             ]
         )
     }
