@@ -238,9 +238,49 @@ export const createRenderer = (options: any) => {
             }
         } else if (i > e2) {
             // i值大于新节点长度e2, 进行remove
-            while(i <= e1) {
+            while (i <= e1) {
                 hostRemove(c1[i].el)
                 i++
+            }
+        } else {
+
+            // 中间进行对比
+
+            let s1 = i;
+            let s2 = i;
+
+            // 新节点获取key值
+            const keyToNewIndexMap = new Map()
+            for (let j = s2; j < e2; j++) {
+                const nextChild = c2[j]
+                keyToNewIndexMap.set(nextChild.key, j)
+            }
+
+            // 旧节点进行循环
+            for (let index = s1; index < e1; index++) {
+
+                const pervChild = c1[index]
+                const pervKey = pervChild.key
+
+                let nextIndex
+                if (pervKey !== null) {
+                    // 获取新节点的对应的keyindex
+                    nextIndex = keyToNewIndexMap.get(pervKey)
+                } else {
+                    for (let j = s2; j < e2; j++) {
+                        if(isSomeVNodeType(pervChild, c2[j])) {
+                            nextIndex = j
+                            break
+                        }
+                    }
+                }
+
+                if(nextIndex !== undefined) {
+                    patch(pervChild, c2[nextIndex], container, parent, null)
+                } else {
+                    // 旧的节点 不存在新的里面，需要删除
+                    hostRemove(c1[index].el)
+                }
             }
         }
     }
