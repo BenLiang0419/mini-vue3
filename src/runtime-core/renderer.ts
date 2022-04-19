@@ -177,7 +177,7 @@ export const createRenderer = (options: any) => {
             return n1.type === n2.type && n1.key === n2.key
         }
 
-        // 左侧
+        // 1. 左侧
         while (i <= e1 && i <= e2) {
             const n1 = c1[i]
             const n2 = c2[i]
@@ -191,7 +191,7 @@ export const createRenderer = (options: any) => {
         }
         console.log('左侧之后i', i)
 
-        // 右侧
+        // 2. 右侧
         while (e1 >= i && e2 >= i) {
             const n1 = c1[e1]
             const n2 = c2[e2]
@@ -206,7 +206,7 @@ export const createRenderer = (options: any) => {
         console.log('右侧之后e1', e1)
         console.log('右侧之后e2', e2)
 
-        // 新的比老的长, 新的进行创建
+        // 3.新的比老的长, 新的进行创建
         // i > 旧的 证明旧的已经diff完了
         // 1 <= 新的 属于diff后需要新增的范围
 
@@ -237,50 +237,89 @@ export const createRenderer = (options: any) => {
                 }
             }
         } else if (i > e2) {
-            // i值大于新节点长度e2, 进行remove
+            // 4. i值大于新节点长度e2, 进行remove
             while (i <= e1) {
                 hostRemove(c1[i].el)
                 i++
             }
         } else {
 
-            // 中间进行对比
+            // 5. 中间进行对比
 
             let s1 = i;
             let s2 = i;
 
+            // 新节点需要对比的节点数
+            let toBePatched = e2 - s2 + 1
+            let patched = 0
+
             // 新节点获取key值
             const keyToNewIndexMap = new Map()
-            for (let j = s2; j < e2; j++) {
+            for (let j = s2; j <= e2; j++) {
                 const nextChild = c2[j]
                 keyToNewIndexMap.set(nextChild.key, j)
             }
 
+            // 进行移动
+            // 定一个长度为 新节点需要对比的节点数量
+            const newIndexToOldIndexMap = new Array(toBePatched)
+            for (let i = 0; i < toBePatched; i++) {
+                newIndexToOldIndexMap[i] = 0
+            }
+
             // 旧节点进行循环
-            for (let index = s1; index < e1; index++) {
+            for (let index = s1; index <= e1; index++) {
 
                 const pervChild = c1[index]
                 const pervKey = pervChild.key
-
                 let nextIndex
+
+                // 旧节点长度比旧节点的要长 且已经不需要对比了 直接删除
+                if (patched >= toBePatched) {
+                    hostRemove(pervChild.el)
+                    continue
+                }
+
                 if (pervKey !== null) {
                     // 获取新节点的对应的keyindex
                     nextIndex = keyToNewIndexMap.get(pervKey)
                 } else {
                     for (let j = s2; j < e2; j++) {
-                        if(isSomeVNodeType(pervChild, c2[j])) {
+                        if (isSomeVNodeType(pervChild, c2[j])) {
                             nextIndex = j
                             break
                         }
                     }
                 }
 
-                if(nextIndex !== undefined) {
+                if (nextIndex !== undefined) {
+                    // +1 的原因是 在使用最长递增子序列算法时候，0是用于判断
+                    newIndexToOldIndexMap[nextIndex - s2] = index + 1
                     patch(pervChild, c2[nextIndex], container, parent, null)
+                    patched++
                 } else {
                     // 旧的节点 不存在新的里面，需要删除
-                    hostRemove(c1[index].el)
+                    hostRemove(pervChild.el)
                 }
+
+                const newIndexSequence = getSequence(newIndexToOldIndexMap)
+                let j = newIndexSequence.length - 1; // 索引 -1
+
+                // 为了稳定的锚点，需要倒序
+                for (let i = toBePatched -1 ; i >= 0; i--) {
+
+                    const nextIndex = i + s2
+                    const nextChild = c2[nextIndex].el
+                    const nextAnchor = nextIndex + 1 < c2.length ? c2[nextIndex + 1].el : null
+
+                    if(i !== newIndexSequence[j]) {
+                        console.log("需要移动位置")
+                        hostInsert(nextChild, container, parent, nextAnchor)
+                    } else {
+                        j++
+                    }
+                }
+
             }
         }
     }
@@ -359,6 +398,52 @@ export const createRenderer = (options: any) => {
         createApp: createAppAPI(render)
     }
 
+}
+
+/**
+ * 最长子序列算法LIS
+ * @param arr 
+ * @returns 
+ */
+function getSequence(arr: number[]): number[] {
+    const p = arr.slice();
+    const result = [0];
+    let i, j, u, v, c;
+    const len = arr.length;
+    for (i = 0; i < len; i++) {
+        const arrI = arr[i];
+        if (arrI !== 0) {
+            j = result[result.length - 1];
+            if (arr[j] < arrI) {
+                p[i] = j;
+                result.push(i);
+                continue;
+            }
+            u = 0;
+            v = result.length - 1;
+            while (u < v) {
+                c = (u + v) >> 1;
+                if (arr[result[c]] < arrI) {
+                    u = c + 1;
+                } else {
+                    v = c;
+                }
+            }
+            if (arrI < arr[result[u]]) {
+                if (u > 0) {
+                    p[i] = result[u - 1];
+                }
+                result[u] = i;
+            }
+        }
+    }
+    u = result.length;
+    v = result[u - 1];
+    while (u-- > 0) {
+        result[u] = v;
+        v = p[v];
+    }
+    return result;
 }
 
 

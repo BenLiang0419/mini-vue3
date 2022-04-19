@@ -89,18 +89,39 @@ export const Array2Array = {
         //     ])
 
         // 右侧
+        // const arrayComponent = h('div', {},
+        //     [
+        //         h('h1', { key: 'D' }, 'Array-D'),
+        //         h('h1', { key: 'E' }, 'Array-E'),
+        //         h('h1', { key: 'A' }, 'Array-A'),
+        //         h('h1', { key: 'B' }, 'Array-B')
+
+        //     ])
+        // const textCompoent = h('div', {},
+        //     [
+        //         h('h1', { key: 'A' }, 'Array-A'),
+        //         h('h1', { key: 'B' }, 'Array-B')
+        //     ])
+
+        // 中间对比
         const arrayComponent = h('div', {},
             [
                 h('h1', { key: 'D' }, 'Array-D'),
+                h('h1', { key: 'C' }, 'Array-C'),
                 h('h1', { key: 'E' }, 'Array-E'),
                 h('h1', { key: 'A' }, 'Array-A'),
                 h('h1', { key: 'B' }, 'Array-B')
-
             ])
+
         const textCompoent = h('div', {},
             [
+                h('h1', { key: 'D' }, 'Array-D'),
+                h('h1', { key: 'E' }, 'Array-E'),
+                h('h1', { key: 'C' }, 'Array-C'),
+                h('h1', { key: 'G' }, 'Array-G'),
                 h('h1', { key: 'A' }, 'Array-A'),
                 h('h1', { key: 'B' }, 'Array-B')
+
             ])
 
         return this.patchStatus === true ? arrayComponent : textCompoent
