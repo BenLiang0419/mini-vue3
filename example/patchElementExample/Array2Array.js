@@ -108,6 +108,7 @@ export const Array2Array = {
             [
                 h('h1', { key: 'D' }, 'Array-D'),
                 h('h1', { key: 'C' }, 'Array-C'),
+                h('h1', { key: 'G' }, 'Array-G'),
                 h('h1', { key: 'E' }, 'Array-E'),
                 h('h1', { key: 'A' }, 'Array-A'),
                 h('h1', { key: 'B' }, 'Array-B')
@@ -116,7 +117,7 @@ export const Array2Array = {
         const textCompoent = h('div', {},
             [
                 h('h1', { key: 'D' }, 'Array-D'),
-                h('h1', { key: 'E' }, 'Array-E'),
+                h('h1', { key: 'F' }, 'Array-F'),
                 h('h1', { key: 'C' }, 'Array-C'),
                 h('h1', { key: 'G' }, 'Array-G'),
                 h('h1', { key: 'A' }, 'Array-A'),
