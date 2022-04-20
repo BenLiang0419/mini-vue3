@@ -9,13 +9,15 @@ export const App = {
         const onClick = () => {
             count.value++;
         }
-        const usrname = ref('BoLi-luyi')
+        const username = ref('BoLi-luyi')
+
+        window.username = username
 
         const onClickComp = () => {
-            usrname.value = 'luyi'
+            username.value = 'luyi'
         }
         return {
-            usrname,
+            username,
             count,
             onClick,
             onClickComp
@@ -28,7 +30,7 @@ export const App = {
                 id: "root"
             },
             [
-                h(Child, { msg: this.usrname }),
+                h(Child, { msg: this.username }),
                 h("button", { onClick: this.onClickComp }, "click2"),
                 h("div", {}, "count: " + this.count),
                 h("button", { onClick: this.onClick }, "click")

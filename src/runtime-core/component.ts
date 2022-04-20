@@ -16,6 +16,9 @@ export const createComponentInstance = (vnode, parent) => {
         slots: {},
         isMounted: false,
         subTree: {},
+        component: null,
+        update: null,
+        next: null, // 存储新的虚拟节点
         provides: parent ? parent.provides : {},
         parent,
         emit: () => { }

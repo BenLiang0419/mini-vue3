@@ -1,6 +1,7 @@
 import { effect } from "../reactivity/effect";
 import { ShapeFlags } from "../shared/shapeFlags";
 import { createComponentInstance, setupComponent } from "./component";
+import { shouldUpdateComponent } from "./componentUpdate";
 import { createAppAPI } from "./createApp";
 import { Fragment, Text } from "./vnode";
 
@@ -49,8 +50,25 @@ export const createRenderer = (options: any) => {
 
     const processComponent = (n1, n2, container, parent, anchor) => {
         // 挂载组件
-        mountComponent(n2, container, parent, anchor)
+        // 如果n1有值，证明是需要进行更新
+        if (!n1) {
+            mountComponent(n2, container, parent, anchor)
+        } else {
+            updateComponent(n1, n2)
+        }
     };
+
+    const updateComponent = (n1, n2) => {
+        // 判断n1, n2的props是否相等
+        // 相等才会进行组件更新
+        if (shouldUpdateComponent(n1, n2)) {
+            console.log('组件更新n1', n1)
+            console.log('组件更新n2', n2)
+            const componet = (n2.componet = n1.component)
+            componet.next = n2
+            componet.updade()
+        }
+    }
 
     const processFragment = (n1, n2, container, parent, anchor) => {
         mountChildren(n2.children, container, parent, anchor)
@@ -89,6 +107,7 @@ export const createRenderer = (options: any) => {
             mountChildren(children, el, parent, anchor)
         }
 
+        // 插入
         hostInsert(el, container, anchor)
     }
 
@@ -356,7 +375,7 @@ export const createRenderer = (options: any) => {
     const mountComponent = (n2, container, parent, anchor) => {
         console.log('parent', parent)
         // 创建组件实例， 收集数据
-        const instance = createComponentInstance(n2, parent)
+        const instance = (n2.component = createComponentInstance(n2, parent))
 
         // 初始化 props, slots, setup
         setupComponent(instance)
@@ -368,7 +387,7 @@ export const createRenderer = (options: any) => {
 
     const setupRenderEffect = (instance, n2, container, anchor) => {
         // 依赖收集
-        effect(() => {
+        instance.updade = effect(() => {
             const { isMounted } = instance
             if (!isMounted) {
                 // 是否初始化
@@ -392,7 +411,16 @@ export const createRenderer = (options: any) => {
                 instance.isMounted = true
 
             } else {
-                const { proxy } = instance
+                console.log('update')
+
+                const { proxy, next, vnode } = instance
+
+                // 更新props
+                // 需要获取vnode, next-> 下次更新虚拟节点，vnode之前的虚拟节点
+                if (next) {
+                    next.el = vnode.el
+                    updateComponentPreRender(instance, next)
+                }
 
                 // 当前（新）节点
                 const subTree = instance.render.call(proxy)
@@ -410,6 +438,12 @@ export const createRenderer = (options: any) => {
 
         })
     };
+
+    const updateComponentPreRender = (instance, nextVNode) => {
+        instance.vnode = nextVNode
+        instance.props = nextVNode.props
+        instance.next = null
+    }
 
     return {
         createApp: createAppAPI(render)
