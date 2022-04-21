@@ -61,12 +61,15 @@ export const createRenderer = (options: any) => {
     const updateComponent = (n1, n2) => {
         // 判断n1, n2的props是否相等
         // 相等才会进行组件更新
+        const component = (n2.component = n1.component)
         if (shouldUpdateComponent(n1, n2)) {
-            console.log('组件更新n1', n1)
-            console.log('组件更新n2', n2)
-            const componet = (n2.componet = n1.component)
-            componet.next = n2
-            componet.updade()
+            console.log('[Function:updateComponent]:组件更新n1', n1)
+            console.log('[Function:updateComponent]:组件更新n2', n2)
+            component.next = n2
+            component.updade()
+        } else {
+            n2.el = n1.el
+            n2.vnode = n2
         }
     }
 
