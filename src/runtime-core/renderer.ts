@@ -9,7 +9,7 @@ import { Fragment, Text } from "./vnode";
 export const createRenderer = (options: any) => {
 
     const {
-        createElement,
+        createElement: hostCreateElement,
         patchProp: hostPatchProp,
         insert: hostInsert,
         remove: hostRemove,
@@ -97,7 +97,7 @@ export const createRenderer = (options: any) => {
 
         // 创建对应的el
         // vnode -> element -> div
-        const el = (vnode.el = createElement(type))
+        const el = (vnode.el = hostCreateElement(type))
 
         // 处理props => 普通属性 和 注册事件
         for (const key in props) {

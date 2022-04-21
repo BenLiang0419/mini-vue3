@@ -24,7 +24,7 @@ function excuteQueue() {
     isExceute = true
     nextTick(() => {
         isExceute = false
-        let job
+        let job;
         while ((job = queue.shift())) {
             job & job()
         }

@@ -45,12 +45,13 @@ export function setupStatefulComponent(instance: any) {
 
     const component = instance.type
 
-    // 组件代理对象
+    // 组件代理对象 this.xx
     instance.proxy = new Proxy({ _: instance }, publicInstanceProxyHandlers)
 
     const { setup } = component
 
     if (setup) {
+        // 存储instance，用于getCurrentInstance
         setCurrentInstance(instance)
         const setupResult = setup(shallowReadonly(instance.props), {
             emit: instance.emit
