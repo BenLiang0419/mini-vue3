@@ -3,6 +3,7 @@ import { ShapeFlags } from "../shared/shapeFlags";
 import { createComponentInstance, setupComponent } from "./component";
 import { shouldUpdateComponent } from "./componentUpdate";
 import { createAppAPI } from "./createApp";
+import { queueJob } from "./scheduler";
 import { Fragment, Text } from "./vnode";
 
 export const createRenderer = (options: any) => {
@@ -66,7 +67,7 @@ export const createRenderer = (options: any) => {
             console.log('[Function:updateComponent]:组件更新n1', n1)
             console.log('[Function:updateComponent]:组件更新n2', n2)
             component.next = n2
-            component.updade()
+            component.update()
         } else {
             n2.el = n1.el
             n2.vnode = n2
@@ -390,7 +391,7 @@ export const createRenderer = (options: any) => {
 
     const setupRenderEffect = (instance, n2, container, anchor) => {
         // 依赖收集
-        instance.updade = effect(() => {
+        instance.update = effect(() => {
             const { isMounted } = instance
             if (!isMounted) {
                 // 是否初始化
@@ -439,6 +440,12 @@ export const createRenderer = (options: any) => {
 
             }
 
+        }, {
+            scheduler: () => {
+                console.log('update - scheduler')
+                // 将effect任务 加入到微任务里，再异步执行微任务
+                queueJob(instance.update)
+            } 
         })
     };
 
